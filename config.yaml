@@ -1,0 +1,78 @@
+constellation:
+  name: starlink_shell2
+  num_sats: 1584
+  num_planes: 72
+  sats_per_plane: 22
+  altitude_km: 540.0
+  inclination_deg: 53.2
+  walker_phase_factor: 39
+  epoch_offset_deg: 0.0
+  isl_topology: plus_grid
+  isl_max_range_km: 5016.0
+physics:
+  earth_radius_km: 6371.0
+  mu_earth_km3_s2: 398600.4418
+  speed_of_light_km_s: 299792.458
+links:
+  isl_bandwidth_gbps: 10.0
+  uplink_bandwidth_gbps: 2.0
+  downlink_bandwidth_gbps: 2.0
+  user_min_elevation_deg: 25.0
+  gs_min_elevation_deg: 25.0
+compute:
+  gs_tflops_low: 500.0
+  gs_tflops_medium: 2500.0
+  gs_tflops_high: 12500.0
+  sat_tflops: 50.0
+  queue_discipline: fifo
+  parallel_workers: 1
+scheduling:
+  # K-hop: how many ISL hops around the ingress sat to search
+  k_hop: 1
+  # K×K: region dimension (regions are K planes × K sats-per-plane)
+  k_region: 4
+  # Per-hop delay the scheduler's cost-function uses (seconds)
+  hop_delay_s: 0.006
+model:
+  models:
+  - id: llama3_1b
+    params_billion: 1.0
+  - id: llama3_8b
+    params_billion: 8.0
+  bytes_per_token: 4
+  flops_per_param_per_token: 2.0
+traffic:
+  global_rate_req_per_s: 100.0
+  arrivals: poisson
+  user_placement: uniform_in_cell
+  trace_source: synthetic_burstgpt
+  trace_seed: 42
+  active_models:
+  - llama3_1b
+  - llama3_8b
+population:
+  grid_deg: 1.0
+  ocean_floor_people_per_cell: 1000
+  source: synthetic
+  data_file: data/population_1deg.npy
+ground_stations:
+  scenarios:
+    low:
+      count: 20
+      file: data/gs_20.csv
+    high:
+      count: 100
+      file: data/gs_100.csv
+simulation:
+  step: step1
+  gs_scenario: low
+  gs_compute_tier: low
+  duration_s: 120
+  warmup_s: 10
+  tick_s: 1.0
+  seed: 12345
+output:
+  results_dir: results
+  plots_dir: plots
+  save_request_log: true
+  save_link_utilization: true
